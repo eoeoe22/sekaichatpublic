@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>세카이 채팅</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="chat-container">
+        <!-- 사이드바 -->
+        <div id="sidebar" class="sidebar p-3">
+            <div class="sidebar-header">
+                <h6><i class="bi bi-chat-dots"></i> 세카이 채팅</h6>
+                <button id="sidebarCloseBtn" class="sidebar-close-btn">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+            
+            <div class="accordion" id="settingsAccordion">
+                <!-- 사용자 정보 -->
+                <div class="form-section">
+                    <h6><i class="bi bi-person-lines-fill"></i> | 사용자 정보</h6>
+                    <div id="userInfo"></div>
+                </div>
+                
+                <!-- 공지사항 -->
+                <div class="form-section notice-section">
+                    <h6><i class="bi bi-info-circle"></i> | 공지사항</h6>
+                    <p id="noticeContent"></p>
+                </div>
+
+                <!-- 대화내역 -->
+                <div class="form-section">
+                    <h6><i class="bi bi-card-list"></i> | 대화내역</h6>
+                    <button id="newConversationBtn" class="btn btn-primary w-100 mb-2">새 대화 시작</button>
+                    
+                    <!-- 검색 기능 -->
+                    <div class="conversation-search mb-3">
+                        <div class="input-group">
+                            <input type="text" id="conversationSearch" class="form-control" placeholder="대화 제목 검색...">
+                            <button class="btn btn-outline-secondary" type="button" id="clearSearchBtn">
+                                <i class="bi bi-x"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="conversationList"></div>
+                </div>
+
+                <!-- 자기소개 -->
+                <div class="form-section">
+                    <h6><i class="bi bi-file-person"></i> | 자기소개</h6>
+                    <form id="selfIntroForm">
+                        <textarea name="self_introduction" id="selfIntroInput" class="form-control mb-2" rows="3" placeholder="자기소개 예시: more more jump 매니저"></textarea>
+                        <button type="submit" class="btn btn-secondary w-100">저장하기</button>
+                    </form>
+                </div>
+
+                <!-- 연속 호출 설정 -->
+                <div class="form-section">
+                    <h6><i class="bi bi-arrow-repeat"></i> | 자동 호출 설정</h6>
+                    <label for="maxAutoCall" class="form-label">최대 연속 호출 횟수</label>
+                    <input type="number" id="maxAutoCall" class="form-control" min="1" max="10" value="3">
+                    <button type="button" class="btn btn-secondary w-100 mt-2" onclick="updateAutoCallSetting()">저장</button>
+                </div>
+
+                <!-- 비밀번호 변경 -->
+                <div class="form-section">
+                    <h6><i class="bi bi-lock"></i> | 비밀번호 변경</h6>
+                    <form id="changePasswordForm">
+                        <input type="password" name="current_password" class="form-control mb-2" placeholder="현재 비밀번호" required>
+                        <input type="password" name="new_password" class="form-control mb-2" placeholder="새 비밀번호" required>
+                        <input type="password" name="confirm_password" class="form-control mb-2" placeholder="새 비밀번호 확인" required>
+                        <button type="submit" class="btn btn-secondary w-100">변경하기</button>
+                    </form>
+                </div>
+
+                <!-- 닉네임 변경 -->
+                <div class="form-section">
+                    <h6><i class="bi bi-people"></i> | 닉네임 변경</h6>
+                    <form id="changeNicknameForm">
+                        <input type="text" name="new_nickname" class="form-control mb-2" placeholder="새 닉네임" required>
+                        <button type="submit" class="btn btn-secondary w-100">변경하기</button>
+                    </form>
+                </div>
+
+                <!-- API 키 관리 -->
+                <div class="form-section">
+                    <h6><i class="bi bi-code-slash"></i> | 개인 API 키 관리</h6>
+                    <form id="apiKeyForm">
+                        <input type="password" name="api_key" id="apiKeyInput" class="form-control mb-2 masked-input" placeholder="개인 Gemini API 키">
+                        <div>
+                            <button type="submit" id="apiKeySubmitBtn" class="btn btn-secondary">등록하기</button>
+                            <button type="button" id="deleteApiKeyBtn" class="btn btn-danger" style="display: none;">삭제하기</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- 로그아웃 -->
+                <button id="logoutBtn" class="btn btn-danger w-100">로그아웃</button>
+            </div>
+            
+            <!-- 사이드바 Footer -->
+            <footer class="sidebar-footer">
+                <div class="sidebar-footer-content">
+                    <div class="sidebar-footer-links">
+                        <span>세카이 채팅</span>
+                        <div class="footer-link-group">
+                            <a href="/characterinfo" target="_blank"><i class="bi bi-person-lines-fill"></i> | 캐릭터 프롬프트</a>
+                            <a href="https://m.dcinside.com/board/pjsekai/2195596" target="_blank"><i class="bi bi-telephone"></i> | 문의/버그제보</a>
+                            <a href="/about"><i class="bi bi-info-circle"></i> | 사이트 정보</a>
+                        </div>
+                    </div>
+                    <div class="sidebar-footer-copyright">
+                        <small>&copy; 세카이 채팅</small>
+                    </div>
+                </div>
+            </footer>
+        </div>
+
+        <div class="chat-main">
+            <!-- 채팅 헤더 -->
+            <div class="chat-header">
+                <div class="profile-section">
+                    <!-- 사이드바 열기 버튼 -->
+                    <button id="sidebarOpenBtn" class="sidebar-open-btn">
+                        <i class="bi bi-list"></i>
+                    </button>
+                    
+                    <div class="character-avatars" id="headerCharacterAvatars">
+                        <!-- 참여 캐릭터들 이미지 표시 -->
+                    </div>
+                    <div class="profile-info">
+                        <div class="conversation-title-container">
+                            <h5 class="profile-name" id="conversationTitle">세카이 채팅</h5>
+                            <button id="editTitleBtn" class="edit-title-btn" title="제목 수정">
+                                <i class="bi bi-pencil-square"></i>
+                            </button>
+                        </div>
+                        <p class="profile-status"><i class="bi bi-cloud-check-fill"></i> | 온라인</p>
+                    </div>
+                </div>
+                
+                <!-- 헤더 컨트롤 영역 -->
+                <div class="header-controls">
+                    <button id="headerControlsToggle" class="header-controls-toggle">
+                        <i class="bi bi-chevron-up"></i>
+                    </button>
+                    
+                    <div id="headerControlsContent" class="header-controls-content">
+                        <div class="model-selector-section">
+                            <label for="modelSelect" class="form-label">
+                                모델:
+                                <button type="button" class="work-mode-info-btn" data-bs-toggle="modal" data-bs-target="#geminiModelInfoModal">
+                                    <i class="bi bi-info-circle"></i>
+                                </button>
+                            </label>
+                            <select id="modelSelect" class="form-select model-select">
+                                <option value="gemini-2.0-flash">Gemini 2.0 Flash</option>
+                                <option value="gemini-2.0-flash-lite">Gemini 2.0 Flash Lite(미권장)</option>
+                                <option value="gemini-2.5-flash" selected>Gemini 2.5 Flash(권장)</option>
+                                <option value="gemini-2.5-flash-lite-preview-06-17">Gemini 2.5 Flash Lite (권장)</option>
+                                <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
+                            </select>
+                        </div>
+                        
+                        <!-- 토글 컨트롤 -->
+                        <div class="toggle-controls">
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="imageToggle" checked>
+                                <label class="form-check-label" for="imageToggle">이미지 보여주기</label>
+                            </div>
+                            
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="workModeToggle">
+                                <label class="form-check-label" for="workModeToggle">작업 모드</label>
+                                <button type="button" class="work-mode-info-btn" data-bs-toggle="modal" data-bs-target="#workModeInfoModal">
+                                    <i class="bi bi-info-circle"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="showTimeToggle" checked>
+                                <label class="form-check-label" for="showTimeToggle">시간 정보 제공</label>
+                            </div>
+                        </div>
+                        
+                        <!-- 상황 프롬프트 버튼 -->
+                        <div class="situation-prompt-section">
+                            <button id="situationPromptBtn" class="btn btn-outline-secondary btn-sm">
+                                <i class="bi bi-card-text"></i> 상황 설정
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="chatMessages" class="chat-messages">
+                <!-- 빈 채팅 화면으로 시작 -->
+            </div>
+            
+            <div class="chat-input">
+                <div class="character-management">
+                    <div class="character-management-header">
+                        <button id="inviteCharacterBtn" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-person-plus"></i> 캐릭터 초대
+                        </button>
+                        <span class="character-help-text">캐릭터를 클릭하면 응답을 생성합니다</span>
+                    </div>
+                    <div id="invitedCharacters" class="invited-characters">
+                        <!-- 초대된 캐릭터들 표시 -->
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <input type="file" id="imageInput" accept="image/*" style="display: none;">
+                    <button id="imageUploadBtn" class="upload-button" title="이미지 업로드">
+                        <i class="bi bi-image"></i>
+                    </button>
+                    <textarea id="messageInput" class="chat-input-field" placeholder="메시지를 입력하세요... (Enter: 전송, Shift+Enter: 줄바꿈)" rows="1"></textarea>
+                    <button id="sendButton" class="send-button"><i class="bi bi-send-fill"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 캐릭터 초대 모달 -->
+    <div class="modal fade" id="inviteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">캐릭터 초대</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="availableCharacters" class="available-characters">
+                        <!-- 초대 가능한 캐릭터들 표시 -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 작업모드 설명 모달 -->
+    <div class="modal fade" id="workModeInfoModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-gear-fill"></i> 작업 모드란?</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="work-mode-explanation">
+                        <h6><i class="bi bi-chat-heart"></i> 몰입 모드 (기본)</h6>
+                        <p>캐릭터의 세계관과 성격에 충실한 대화입니다. 캐릭터들이 자신의 설정을 최대한 준수하며 대화를 나눕니다.</p>
+                        
+                        <hr>
+                        
+                        <h6><i class="bi bi-gear-fill"></i> 작업 모드</h6>
+                        <p>실용적이며 정보 제공 중심의 대화입니다. 캐릭터의 말투는 유지하되, 실질적인 도움을 제공하는 데 집중합니다.</p>
+                        
+                        <div class="alert alert-info mt-3">
+                            <i class="bi bi-lightbulb"></i> 
+                            <strong>모드별 권장 모델</strong><br>작업 모드<br>
+                            <i class="bi bi-cpu"></i> | Gemini 2.5 Pro<br><br>
+
+                            몰입 모드<br>
+                            <i class="bi bi-stars"></i> | Gemini 2.5 Flash<br>
+                            <i class="bi bi-lightning-charge"></i> | Gemini 2.5 Flash Lite
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gemini 모델 설명 모달 -->
+    <div class="modal fade" id="geminiModelInfoModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-cpu"></i> Gemini 모델 비교</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="model-explanation">
+                        <h6><i class="bi bi-lightning-charge-fill"></i> Gemini 2.5 Flash (권장)</h6>
+                        <p>균형 잡힌 성능과 속도를 제공하는 최신 모델입니다. 일반적인 대화에 가장 적합합니다.</p>
+                        
+                        <hr>
+                        
+                        <h6><i class="bi bi-lightning-charge"></i> Gemini 2.5 Flash Lite (권장)</h6>
+                        <p>빠른 응답 속도에 최적화된 경량 모델입니다. 일상 대화와 빠른 상호작용에 적합합니다.</p>
+                        
+                        <hr>
+                        
+                        <h6><i class="bi bi-cpu-fill"></i> Gemini 2.5 Pro</h6>
+                        <p>가장 강력한 성능과 고급 추론을 제공하는 최고 성능 모델입니다. 복잡한 질문이나 작업 모드에 최적화되어 있습니다.</p>
+                        
+                        <hr>
+                        
+                        <h6><i class="bi bi-speedometer2"></i> Gemini 2.0 Flash</h6>
+                        <p>이전 세대 모델로, 안정적인 성능을 제공합니다.</p>
+                        
+                        <hr>
+                        
+                        <h6><i class="bi bi-exclamation-triangle"></i> Gemini 2.0 Flash Lite (미권장)</h6>
+                        <p>구버전 경량 모델로, 품질이 낮을 수 있습니다.</p>
+                        
+                        <div class="alert alert-success mt-3">
+                            <i class="bi bi-lightbulb"></i> 
+                            <strong>추천 사용법</strong><br>
+                            일반 대화: <strong>Gemini 2.5 Flash</strong><br>
+                            빠른 응답: <strong>Gemini 2.5 Flash Lite</strong><br>
+                            복잡한 작업: <strong>Gemini 2.5 Pro</strong>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 제목 수정 모달 -->
+    <div class="modal fade" id="editTitleModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-pencil-square"></i> 대화 제목 수정</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editTitleForm">
+                        <div class="form-group">
+                            <label for="newTitleInput" class="form-label">새 제목</label>
+                            <input type="text" class="form-control" id="newTitleInput" maxlength="100" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" id="saveTitleBtn">저장</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 상황 프롬프트 모달 -->
+    <div class="modal fade" id="situationPromptModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="bi bi-card-text"></i> 상황 설정 프롬프트</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="situationPromptForm">
+                        <div class="form-group">
+                            <label for="situationPromptInput" class="form-label">상황 설정</label>
+                            <textarea class="form-control" id="situationPromptInput" rows="6" placeholder="상황, 장소 등을 설정하세요. 예: '학교 옥상에서 점심시간', '카페에서 만난 상황', '축제 준비를 하는 중' 등"></textarea>
+                            <div class="form-text">이 설정은 현재 대화에만 적용됩니다. 캐릭터들이 해당 상황을 인지하고 대화합니다.</div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-danger" id="clearSituationBtn">설정 삭제</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" id="saveSituationBtn">저장</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 업로드 진행률 모달 -->
+    <div class="modal fade" id="uploadModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-body text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p class="mt-2"><i class="bi bi-cloud-arrow-up"></i> | 이미지 업로드 중...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="/js/sidebar.js"></script>
+    <script src="/js/chat.js"></script>
+</body>
+</html>

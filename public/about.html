@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - 세카이 채팅</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+        .about-container {
+            max-width: 800px;
+            margin: 40px auto 0 auto;
+            padding: 40px 30px;
+            background: var(--card-bg, white);
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        }
+        .about-logo {
+            font-size: 48px;
+            color: #667eea;
+        }
+        .about-title {
+            font-size: 2.3rem;
+            font-weight: 700;
+            color: var(--button-hover-color, #4682B4);
+            margin-bottom: 10px;
+        }
+        .about-section-title {
+            color: var(--button-hover-color, #4682B4);
+            font-size: 1.15rem;
+            margin-top: 28px;
+            font-weight: 600;
+        }
+        .about-link {
+            color: var(--button-color, #87CEEB);
+            text-decoration: underline;
+        }
+        .about-link:hover {
+            color: var(--button-hover-color, #4682B4);
+        }
+        @media (max-width: 768px) {
+            .about-container { padding: 18px 8px; }
+            .about-title { font-size: 1.3rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container my-4">
+        <div class="about-container">
+            <div class="text-center mb-4">
+                <div class="about-logo">
+                    <i class="bi bi-chat-heart-fill"></i>
+                </div>
+                <div class="about-title">세카이 채팅 - About</div>
+                <div class="mb-2" style="color:#666">Google Gemini 기반 다중 캐릭터 챗봇 프로젝트</div>
+            </div>
+            
+            <div>
+                <div class="about-section-title"><i class="bi bi-flag"></i> 프로젝트 개요</div>
+                <p>
+                    세카이 채팅은 다양한 캐릭터와 대화할 수 있는 다중 캐릭터 AI 챗봇 서비스입니다. 실시간 대화, 이미지 업로드, 캐릭터 프롬프트 및 커스텀 이모지를 지원하며, Google Gemini API 기반의 자연스러운 언어 처리와 주제별 작업 모드를 제공합니다.  
+                    <br>
+                    <small>이 사이트는 비영리 2차 창작물입니다.</small>
+                    <br>
+                    <small><i class="bi bi-currency-dollar"></i>서버비 0원 / 수익 0원</small>
+                </p>
+                <div class="about-section-title"><i class="bi bi-stars"></i> 주요 특징</div>
+                <ul>
+                    <li>여러 캐릭터와의 멀티 대화, 초대/호출/챗봇들간 자동 호출</li>
+                    <li>개인 Gemini API 키 등록/사용자 닉네임/자기소개 설정</li>
+                    <li>자연스러운 대화의 기본 모드, 유용한 답변을 제공하는 작업 모드 지원</li>
+                </ul>
+                <div class="about-section-title"><i class="bi bi-person-badge"></i> 제작자 & 문의</div>
+                <ul>
+                    <li>제작/관리: &lt;b&gt;유동닉 (eoeoe)</li>
+                    <li>문의/버그제보: 
+                        <a href="https://gall.dcinside.com/m/thesingularity/776222"><i class="bi bi-box-arrow-up-right"></i> 어지간하면 여기 댓글</a>
+                        <br>
+                        <i class="bi bi-envelope-fill"></i> | <a href="mailto:eoe@vialinks.xyz" class="about-link">eoe@vialinks.xyz</a>
+                    </li>
+                </ul>
+                <div class="about-section-title"><i class="bi bi-shield-check"></i> 개인정보/운영 안내</div>
+                <ul>
+                    <li>서버·DB는 Cloudflare Workers/D1에 보관되며, 비밀번호는 해시+솔팅 암호화하여 저장합니다.</li>
+                    <li>개인 Gemini API키는 사용자가 직접 입력시 서버 DB에 저장한, 삭제 버튼 클릭시 즉시 완전 삭제됩니다.</li>
+                    <li>모든 대화 데이터/파일은 본 사이트 외부로 전송하거나 이용하지 않습니다</li>
+                </ul>
+            </div>
+            <div class="about-section-title"><i class="bi bi-cpu"></i> AI 모델 및 기술</div>
+            <ul>
+        <il></il><i class="bi bi-google"></i> <b>Google Gemini</b>가 챗봇의 핵심을 담당하며, 대화와 이미지를 처리합니다.</il><br>
+        <il><i class="bi bi-anthropic"></i> <b>Anthropic Claude Sonnet</b>을 사용해 개발되었습니다.</il><br>
+</ul>
+
+            <div class="text-center mt-4">
+                <a href="/" class="btn btn-primary">
+                    <i class="bi bi-house"></i> 홈으로
+                </a>
+                <a href="/chat" class="btn btn-secondary">
+                    <i class="bi bi-chat-dots"></i> 채팅 시작
+                </a>
+            </div>
+        </div>
+        <div class="text-center mt-4 mb-2" style="color:#aaa; font-size:13px;">
+            &copy; 2025 세카이 채팅 Project | Powered by <i class="bi bi-google"></i> Google Gemini, <i class="bi bi-cloud"></i> Cloudflare Workers<br>
+        </div>
+    </div>
+</body>
+</html>
